@@ -1,0 +1,64 @@
+---
+title: Task 1
+jupyter: python3
+---
+
+## Web scraping and analysis
+
+This Jupyter notebook includes some code to get you started with web scraping. We will use a package called `BeautifulSoup` to collect the data from the web. Once you've collected your data and saved it into a local `.csv` file you should start with your analysis.
+
+### Scraping data from Skytrax
+
+If you visit [https://www.airlinequality.com] you can see that there is a lot of data there. For this task, we are only interested in reviews related to British Airways and the Airline itself.
+
+If you navigate to this link: [https://www.airlinequality.com/airline-reviews/british-airways] you will see this data. Now, we can use `Python` and `BeautifulSoup` to collect all the links to the reviews and then to collect the text data on each of the individual review links.
+
+
+```{python}
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+```
+
+```{python}
+base_url = "https://www.airlinequality.com/airline-reviews/british-airways"
+pages = 10
+page_size = 100
+
+reviews = []
+
+# for i in range(1, pages + 1):
+for i in range(1, pages + 1):
+
+    print(f"Scraping page {i}")
+
+    # Create URL to collect links from paginated data
+    url = f"{base_url}/page/{i}/?sortby=post_date%3ADesc&pagesize={page_size}"
+
+    # Collect HTML data from this page
+    response = requests.get(url)
+
+    # Parse content
+    content = response.content
+    parsed_content = BeautifulSoup(content, 'html.parser')
+    for para in parsed_content.find_all("div", {"class": "text_content"}):
+        reviews.append(para.get_text())
+    
+    print(f"   ---> {len(reviews)} total reviews")
+```
+
+```{python}
+df = pd.DataFrame()
+df["reviews"] = reviews
+df.head()
+```
+
+```{python}
+df.to_csv("data/BA_reviews.csv")
+```
+
+Congratulations! Now you have your dataset for this task! The loops above collected 1000 reviews by iterating through the paginated pages on the website. However, if you want to collect more data, try increasing the number of pages!
+
+ The next thing that you should do is clean this data to remove any unnecessary text from each of the rows. For example, "✅ Trip Verified" can be removed from each row if it exists, as it's not relevant to what we want to investigate.
+
+
