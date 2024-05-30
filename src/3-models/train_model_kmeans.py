@@ -3,7 +3,6 @@ import gzip
 import pickle
 import numpy as np
 from sklearn.cluster import KMeans
-from pca import pca
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
